@@ -5,8 +5,7 @@ from torchvision import transforms
 from PIL import Image
 import yaml
 import argparse
-
-# Make sure to import your model definition
+from cnn_occlusion_robustness.train import get_effect
 from cnn_occlusion_robustness.models.simple_cnn import SimpleCNN
 
 # Dictionary to store the activations
@@ -18,7 +17,7 @@ def get_activation(name):
         activations[name] = output.detach()
     return hook
 
-def visualize_activations(config_path: str, model_path: str, image_path: str, output_dir: str):
+def visualize_activations(config_path: str, model_path: str, image_path: str, output_dir: str, test_effect: str):
     """Loads a model and an image, and visualizes the layer activations."""
     
     # --- 1. Load Configuration and Build the Model ---
@@ -49,15 +48,29 @@ def visualize_activations(config_path: str, model_path: str, image_path: str, ou
         transforms.ToTensor(),
     ])
     image = Image.open(image_path).convert('RGB')
-    image_tensor = transform(image).unsqueeze(0) # Add a batch dimension
+    clean_image_tensor = transform(image) # Start with a clean tensor
     
-    # --- 4. Perform Forward Pass ---
+    # --- 4. APPLY OCCLUSION EFFECT (NEW STEP) ---
+    effect_instance = get_effect(test_effect)
+    
+    # Convert tensor to numpy, apply effect, and convert back to tensor
+    # This logic is borrowed from the AugmentedDataset in train.py
+    image_np = (clean_image_tensor.permute(1, 2, 0).contiguous().numpy() * 255).astype('uint8')
+    augmented_np = effect_instance(image_np)
+    augmented_tensor = torch.from_numpy(augmented_np).permute(2, 0, 1) / 255.0
+    
+    # Add the batch dimension for the model
+    final_image_tensor = augmented_tensor.float().unsqueeze(0)
+    
+    # --- 5. Perform Forward Pass ---
     with torch.no_grad():
-        output = model(image_tensor)
+        # Use the potentially augmented tensor
+        output = model(final_image_tensor)
     
-    print("Forward pass complete. Activations captured.")
+    print(f"Forward pass complete for effect '{test_effect}'. Activations captured.")
+
     
-    # --- 5. Plot the Activations ---
+    # --- 6. Plot the Activations ---
     for name, feature_map in activations.items():
         # The feature map is a 4D tensor (batch, channels, height, width)
         # We take the first item in the batch
@@ -89,12 +102,21 @@ def main():
     parser.add_argument('--model-path', type=str, required=True, help="Path to the trained model (.pth).")
     parser.add_argument('--image-path', type=str, required=True, help="Path to the input image.")
     parser.add_argument('--output-dir', type=str, default='activations_output', help="Directory to save output images.")
+    parser.add_argument('--test-effect', type=str, default='none', 
+                        help="Occlusion effect to apply to the input image.")
+ 
     args = parser.parse_args()
     
     import os
     os.makedirs(args.output_dir, exist_ok=True)
     
-    visualize_activations(args.config, args.model_path, args.image_path, args.output_dir)
+    visualize_activations(
+        config_path=args.config,
+        model_path=args.model_path,
+        image_path=args.image_path,
+        output_dir=args.output_dir,
+        test_effect=args.test_effect )
+    
 
 if __name__ == '__main__':
     main()
