@@ -39,7 +39,7 @@ cnn-occlusion-robustness/
 
 #### 1. Clone the Repository
 ```bash
-git clone [https://github.com/your-username/cnn-occlusion-robustness.git](https://github.com/your-username/cnn-occlusion-robustness.git)
+git clone https://github.com/your-username/cnn-occlusion-robustness.git
 cd cnn-occlusion-robustness
 ```
 
@@ -56,13 +56,40 @@ Install the project in editable mode (`-e`), which automatically discovers and i
 pip install -e .
 ```
 
-#### 4. Download and Prepare the Dataset
-1.  Download the GTSRB dataset from [here](https://sid.erda.dk/public/archives/daaeac0d7ce11523b6998da45b0c7961/GTSRB_Final_Training_Images.zip) (Training Set) and [here](https://sid.erda.dk/public/archives/daaeac0d7ce11523b6998da45b0c7961/GTSRB_Final_Test_Images.zip) (Test Set).
-2.  Unzip them into a parent directory, for example `../GTSRB_dataset/`.
-3.  The GTSRB test set images are provided in a flat folder. Run the provided script once to organize them into class-specific subfolders, which is required for evaluation.
-```bash
-python scripts/organize_test_set.py
-```
+#### 4. Download and Prepare the GTSRB Dataset
+This project requires the image data for both the training and test sets.
+
+1.  **Go to the official GTSRB archive:** [https://sid.erda.dk/public/archives/daaeac0d7ce1152aea9b61d9f1e19370/published-archive.html](https://sid.erda.dk/public/archives/daaeac0d7ce1152aea9b61d9f1e19370/published-archive.html)
+
+2.  **Download the required files:** From the file list, you only need to download the following two zip archives:
+    * `GTSRB_Final_Training_Images.zip` (The training set images)
+    * `GTSRB_Final_Test_Images.zip` (The test set images and their ground truth CSV)
+
+3.  **Arrange the data:** Create a parent directory for the dataset outside of the project folder. Unzip both archives into this directory. The final structure should look like this:
+    ```
+    ../
+    ├── GTSRB_dataset/
+    │   ├── GTSRB/
+    │   │   └── Final_Training/
+    │   │       └── Images/
+    │   │           ├── 00000/
+    │   │           ├── 00001/
+    │   │           └── ... (41 other class folders)
+    │   └── GTSRB_test/
+    │       └── Final_Test/
+    │           └── Images/
+    │               ├── 00000.ppm
+    │               ├── 00001.ppm
+    │               ├── ...
+    │               └── GT-final_test.test.csv
+    └── cnn-occlusion-robustness/  (Your project folder)
+    ```
+
+4.  **Run the pre-processing script:** The training images are already organized into class folders, but the test images are not. The `organize_test_set.py` script reads the included `GT-final_test.test.csv` file and automatically moves each test image into a subfolder corresponding to its class label. This step is **mandatory** for the evaluation code to work.
+    ```bash
+    python scripts/organize_test_set.py
+    ```
+    After running, your `GTSRB_test/Final_Test/Images/` directory will now contain class folders (`00000`, `00001`, etc.), just like the training set.
 
 ## Running Experiments
 
