@@ -63,7 +63,8 @@ def visualize_filters(config_path: str, model_path: str, layer_name: str, output
     plt.show()
     print(f"Filter visualization saved to {output_path}")
 
-if __name__ == '__main__':
+def main():
+    """Main function to handle command-line arguments and run the visualization."""
     parser = argparse.ArgumentParser(description="Visualize the filters of a trained SimpleCNN model.")
     parser.add_argument('--config', type=str, required=True, help="Path to the experiment config file (.yaml).")
     parser.add_argument('--model-path', type=str, required=True, help="Path to the trained model (.pth).")
@@ -72,3 +73,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
     
     visualize_filters(args.config, args.model_path, args.layer_name, args.output_path)
+
+
+if __name__ == '__main__':
+    main()
+

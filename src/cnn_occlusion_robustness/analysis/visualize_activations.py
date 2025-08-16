@@ -81,9 +81,10 @@ def visualize_activations(config_path: str, model_path: str, image_path: str, ou
         plt.show()
         print(f"Activation plot for '{name}' saved to {save_path}")
 
-if __name__ == '__main__':
+
+def main():
+    """Main function to handle command-line arguments and run the visualization."""
     parser = argparse.ArgumentParser(description="Visualize layer activations for a given image.")
-    # ADD the config path argument
     parser.add_argument('--config', type=str, required=True, help="Path to the experiment config file (.yaml).")
     parser.add_argument('--model-path', type=str, required=True, help="Path to the trained model (.pth).")
     parser.add_argument('--image-path', type=str, required=True, help="Path to the input image.")
@@ -95,3 +96,5 @@ if __name__ == '__main__':
     
     visualize_activations(args.config, args.model_path, args.image_path, args.output_dir)
 
+if __name__ == '__main__':
+    main()
