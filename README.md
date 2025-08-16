@@ -39,7 +39,7 @@ cnn-occlusion-robustness/
 
 #### 1. Clone the Repository
 ```bash
-git clone https://github.com/your-username/cnn-occlusion-robustness.git
+git clone https://github.com/kilojoules/cnn-occlusion-robustness.git
 cd cnn-occlusion-robustness
 ```
 
