@@ -44,10 +44,10 @@ cd cnn-occlusion-robustness
 ```
 
 #### 2. Create a Virtual Environment
-It's recommended to use a virtual environment.
+It's recommended to use a conda environment.
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+conda create -n robust_cnn python=3.11
+conda activate robust_cnn
 ```
 
 #### 3. Install Dependencies
