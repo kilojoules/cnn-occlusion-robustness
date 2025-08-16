@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cnn-occlusion-robustness"
+version = "0.1.0"
+authors = [
+  { name="Julian Quick" }
+]
+description = "A research project to study the robustness of CNNs to camera occlusion effects using the GTSRB dataset."
+requires-python = ">=3.8"
+license = { file="LICENSE" } # You can re-use the LICENSE file
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+# Core dependencies for the entire project
+dependencies = [
+    "camera_occlusion",
+    "torch",
+    "torchvision",
+    "numpy",
+    "opencv-python",
+    "imageio",
+    "tqdm",
+    "pandas",
+    "matplotlib",
+    "seaborn",
+    "scipy",
+    "scikit-learn",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/your-username/cnn-occlusion-robustness" # Update this
+
+# This section creates the command-line entry points
+# Running `train-gtsrb` will execute the `main` function in `src/train.py`
+[project.scripts]
+train-gtsrb = "src.train:main"
+analyze-results = "src.analysis.advanced_analysis_report:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]  
