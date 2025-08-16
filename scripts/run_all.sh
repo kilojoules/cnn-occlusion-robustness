@@ -47,6 +47,7 @@ for train_effect in $TRAIN_CONDITIONS; do
             echo "Evaluation result $OUTPUT_PATH already exists. Skipping."
         else
             python src/cnn_occlusion_robustness/eval.py \
+                --config "$CONFIG_FILE" \
                 --model-path "$MODEL_PATH" \
                 --data-dir "$TEST_DATA_DIR" \
                 --test-effect "$test_effect" \
