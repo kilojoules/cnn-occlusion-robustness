@@ -139,9 +139,18 @@ def main():
     train_loader = DataLoader(augmented_train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4)
     
-    model = SimpleCNN(num_classes=43).to(device)
+    # Get the model architecture details from the config
+    model_config = config.get('model')
+    if not model_config:
+        raise ValueError("Model configuration not found in YAML file.")
+    
+    # Instantiate the model using the parameters from the config
+    # The ** operator unpacks the dictionary into keyword arguments
+    model = SimpleCNN(**model_config['params']).to(device)
+    
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
     
     # --- 3. Training and Validation Loop ---
     history = {'train_loss': [], 'train_acc': [], 'val_loss': [], 'val_acc': []}

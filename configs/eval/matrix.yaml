@@ -1,0 +1,33 @@
+# Paths
+data_dir: "../GTSRB_dataset/GTSRB/Final_Training/Images/"
+test_data_dir: "../GTSRB_dataset/GTSRB_test/Final_Test/Images/"
+
+# General experiment parameters
+epochs: 1 # Reduced from 3 to 1 for the quickest training cycle.
+learning_rate: 0.001
+batch_size: 64
+
+model:
+  name: "SimpleCNN" # Allows for selecting different models later
+  params:
+    num_classes: 43
+    # Define channels as a list: [input, conv1_output, conv2_output]
+    channels: [3, 6, 16]
+    kernel_size: 5
+    # Define features for fully-connected layers: [fc1_output, fc2_output]
+    fc_features: [120, 84]
+
+
+# List of effects to use for training models
+# Train only the baseline and one complex model to start.
+training_conditions:
+  - none
+  - mixed_heavy
+
+# List of effects to use for testing
+# Test against a small, representative subset of conditions.
+test_conditions:
+  - none
+  - heavy_rain
+  - heavy_dust
+  - mixed_heavy

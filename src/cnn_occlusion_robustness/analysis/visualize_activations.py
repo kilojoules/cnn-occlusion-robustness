@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import torchvision
 from torchvision import transforms
 from PIL import Image
+import yaml
 import argparse
 
 # Make sure to import your model definition
@@ -17,17 +18,27 @@ def get_activation(name):
         activations[name] = output.detach()
     return hook
 
-def visualize_activations(model_path: str, image_path: str, output_dir: str):
+def visualize_activations(config_path: str, model_path: str, image_path: str, output_dir: str):
     """Loads a model and an image, and visualizes the layer activations."""
     
-    # --- 1. Load the Model ---
-    model = SimpleCNN(num_classes=43)
+    # --- 1. Load Configuration and Build the Model ---
+    with open(config_path, 'r') as f:
+        config = yaml.safe_load(f)
+    
+    model_params = config.get('model', {}).get('params', {})
+    if not model_params:
+        raise ValueError("Model parameters not found in config file.")
+
+    # Build the model with the correct architecture
+    model = SimpleCNN(**model_params)
+    
+    # Load the trained weights into the correctly-structured model
     model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
     model.eval()
-    print(f"Model loaded from {model_path}")
+    print(f"Model loaded from {model_path} using architecture from {config_path}")
     
     # --- 2. Register Hooks ---
-    # Register a forward hook for each layer we want to inspect
+    # This part remains the same. It correctly targets the hidden layers.
     model.conv1.register_forward_hook(get_activation('conv1'))
     model.pool.register_forward_hook(get_activation('pool1'))
     model.conv2.register_forward_hook(get_activation('conv2'))
@@ -72,6 +83,8 @@ def visualize_activations(model_path: str, image_path: str, output_dir: str):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Visualize layer activations for a given image.")
+    # ADD the config path argument
+    parser.add_argument('--config', type=str, required=True, help="Path to the experiment config file (.yaml).")
     parser.add_argument('--model-path', type=str, required=True, help="Path to the trained model (.pth).")
     parser.add_argument('--image-path', type=str, required=True, help="Path to the input image.")
     parser.add_argument('--output-dir', type=str, default='activations_output', help="Directory to save output images.")
@@ -80,4 +93,5 @@ if __name__ == '__main__':
     import os
     os.makedirs(args.output_dir, exist_ok=True)
     
-    visualize_activations(args.model_path, args.image_path, args.output_dir)
+    visualize_activations(args.config, args.model_path, args.image_path, args.output_dir)
+
