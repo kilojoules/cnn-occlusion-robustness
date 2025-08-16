@@ -3,6 +3,7 @@ import pandas as pd
 import shutil
 from tqdm import tqdm
 
+
 def organize_gtsrb_test_set():
     """
     Reads the GTSRB test set CSV and organizes the flat image files
@@ -10,12 +11,12 @@ def organize_gtsrb_test_set():
     """
     # --- Configuration ---
     # This script assumes it's being run from the project's root directory.
-    base_path = '../GTSRB_dataset/GTSRB_test/Final_Test/'
-    images_dir = os.path.join(base_path, 'Images')
+    base_path = "../GTSRB_dataset/GTSRB_test/Final_Test/"
+    images_dir = os.path.join(base_path, "Images")
 
     # CORRECTED path to the CSV file, now pointing inside the Images directory
     # CORRECTED filename to 'GT-final_test.test.csv'
-    csv_path = os.path.join(images_dir, 'GT-final_test.test.csv')
+    csv_path = os.path.join(images_dir, "GT-final_test.test.csv")
 
     print(f"Reading image labels from: {csv_path}")
 
@@ -26,19 +27,15 @@ def organize_gtsrb_test_set():
         return
 
     # Read the CSV file. GTSRB uses semicolons as separators.
-    try:
-        df = pd.read_csv(csv_path, sep=';')
-    except Exception as e:
-        print(f"Error reading CSV file: {e}")
-        return
+    df = pd.read_csv(csv_path, sep=";")
 
     print(f"Found {len(df)} image entries.")
     print("Starting to organize images into class folders...")
 
     # Iterate over each row in the dataframe
     for _, row in tqdm(df.iterrows(), total=df.shape[0]):
-        filename = row['Filename']
-        class_id = row['ClassId']
+        filename = row["Filename"]
+        class_id = row["ClassId"]
 
         # Create the five-digit folder name (e.g., 5 -> '00005')
         class_folder_name = f"{class_id:05d}"
@@ -56,8 +53,10 @@ def organize_gtsrb_test_set():
             shutil.move(src_path, dest_path)
 
     print("\n✅ Test set reorganization complete!")
-    print(f"Images have been moved into class-specific subfolders inside '{images_dir}'")
+    print(
+        f"Images have been moved into class-specific subfolders inside '{images_dir}'"
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     organize_gtsrb_test_set()
