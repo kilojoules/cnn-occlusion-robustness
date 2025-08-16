@@ -134,6 +134,9 @@ visualize-filters \
 ```
 
 *Example: Visualize `conv2` filters from the same model:*
+
+The current script handles this by just showing the weights for the first input channel of each filter as a grayscale image, which is a common simplification but not always a complete picture.
+
 ```bash
 visualize-filters \
     --config configs/eval/matrix.yaml \
