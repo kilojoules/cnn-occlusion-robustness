@@ -68,4 +68,6 @@ python src/cnn_occlusion_robustness/analysis/advanced_analysis_report.py \
     --results-dir "$RESULTS_DIR" \
     --output-dir "analysis_output"
 
+plot-training-curves --results-dir results/models/ --output-dir analysis_output/figures/training_curves --smooth-k 3
+
 echo "--- ✅ Pipeline Complete! Check analysis_output/ for results. ---"
