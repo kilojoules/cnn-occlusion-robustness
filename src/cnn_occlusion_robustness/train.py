@@ -67,12 +67,18 @@ def get_effect(effect_name: str) -> Effect:
     """Factory function to get an effect instance from its name."""
     effects = {
         "none": NoOp(),
-        "light_rain": Rain(num_drops=15, radius_range=(2, 4)),
-        "moderate_rain": Rain(num_drops=50, radius_range=(3, 6)),
-        "heavy_rain": Rain(num_drops=100, radius_range=(4, 8)),
-        "light_dust": Dust(num_specks=1000, splotch_opacity=0.08),
-        "moderate_dust": Dust(num_specks=2500, splotch_opacity=0.12),
-        "heavy_dust": Dust(num_specks=5000, num_scratches=5, splotch_opacity=0.15),
+        "light_rain": Rain(num_drops=15, radius_range=(2, 4), magnification=1.03),
+        "moderate_rain": Rain(num_drops=50, radius_range=(3, 6), magnification=1.08),
+        "heavy_rain": Rain(num_drops=100, radius_range=(4, 8), magnification=1.15),
+        "light_dust": Dust(
+            num_specks=20, speck_opacity=0.4, num_scratches=1, splotch_opacity=0.1
+        ),
+        "moderate_dust": Dust(
+            num_specks=40, speck_opacity=0.4, num_scratches=3, splotch_opacity=0.05
+        ),
+        "heavy_dust": Dust(
+            num_specks=50, speck_opacity=0.8, num_scratches=5, splotch_opacity=0.02
+        ),
         "mixed_light": apply_mixed_light,
         "mixed_heavy": apply_mixed_heavy,
     }
