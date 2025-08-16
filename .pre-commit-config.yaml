@@ -32,4 +32,3 @@ repos:
     rev: v0.1.7
     hooks:
       - id: silent-killers-audit
-        files: ^(src/|scripts/|tests/).*\.py$
