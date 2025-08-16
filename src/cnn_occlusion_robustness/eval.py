@@ -22,7 +22,9 @@ def _resolve_device() -> torch.device:
     return torch.device("cpu")
 
 
-def _load_model_from_config(config_path: str, weights_path: str, device: torch.device) -> SimpleCNN:
+def _load_model_from_config(
+    config_path: str, weights_path: str, device: torch.device
+) -> SimpleCNN:
     if not os.path.exists(config_path):
         raise FileNotFoundError(f"Config file not found: {config_path}")
 
@@ -67,10 +69,12 @@ def evaluate_model(
     print(f"Loaded model from '{model_path}' using architecture in '{config_path}'")
 
     # 2) Prepare dataset (+ optional occlusion augmentation for eval)
-    transform = transforms.Compose([
-        transforms.Resize((32, 32)),
-        transforms.ToTensor(),
-    ])
+    transform = transforms.Compose(
+        [
+            transforms.Resize((32, 32)),
+            transforms.ToTensor(),
+        ]
+    )
 
     if not os.path.isdir(data_dir):
         raise FileNotFoundError(
@@ -124,21 +128,45 @@ def evaluate_model(
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Evaluate a trained CNN model on a specified test condition.")
-    parser.add_argument("--config", type=str, required=True,
-                        help="Path to the experiment YAML config used to define the model architecture.")
-    parser.add_argument("--model-path", type=str, required=True,
-                        help="Path to the trained model weights (.pth).")
-    parser.add_argument("--data-dir", type=str, required=True,
-                        help="Path to the organized GTSRB test dataset (class subfolders).")
-    parser.add_argument("--test-effect", type=str, required=True,
-                        help="Occlusion effect to apply during testing (e.g., 'none', 'heavy_rain').")
-    parser.add_argument("--output-path", type=str, required=True,
-                        help="Path to save the evaluation result JSON.")
-    parser.add_argument("--batch-size", type=int, default=128,
-                        help="Batch size for evaluation.")
-    parser.add_argument("--num-workers", type=int, default=None,
-                        help="DataLoader workers (default: 2).")
+    parser = argparse.ArgumentParser(
+        description="Evaluate a trained CNN model on a specified test condition."
+    )
+    parser.add_argument(
+        "--config",
+        type=str,
+        required=True,
+        help="Path to the experiment YAML config used to define the model architecture.",
+    )
+    parser.add_argument(
+        "--model-path",
+        type=str,
+        required=True,
+        help="Path to the trained model weights (.pth).",
+    )
+    parser.add_argument(
+        "--data-dir",
+        type=str,
+        required=True,
+        help="Path to the organized GTSRB test dataset (class subfolders).",
+    )
+    parser.add_argument(
+        "--test-effect",
+        type=str,
+        required=True,
+        help="Occlusion effect to apply during testing (e.g., 'none', 'heavy_rain').",
+    )
+    parser.add_argument(
+        "--output-path",
+        type=str,
+        required=True,
+        help="Path to save the evaluation result JSON.",
+    )
+    parser.add_argument(
+        "--batch-size", type=int, default=128, help="Batch size for evaluation."
+    )
+    parser.add_argument(
+        "--num-workers", type=int, default=None, help="DataLoader workers (default: 2)."
+    )
     args = parser.parse_args()
 
     evaluate_model(

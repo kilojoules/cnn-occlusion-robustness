@@ -37,7 +37,7 @@ dependencies = [
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/your-username/cnn-occlusion-robustness" 
+"Homepage" = "https://github.com/your-username/cnn-occlusion-robustness"
 
 [project.scripts]
 train-gtsrb = "cnn_occlusion_robustness.train:main"

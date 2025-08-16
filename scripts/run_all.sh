@@ -22,7 +22,7 @@ echo "--- 🧑‍🍳 Phase 1: Training all models using config: $CONFIG_FILE --
 for train_effect in $TRAIN_CONDITIONS; do
     echo "Training model for effect: $train_effect"
     MODEL_PATH="$MODELS_DIR/${train_effect}_model.pth"
-    
+
     if [ -f "$MODEL_PATH" ]; then
         echo "Model $MODEL_PATH already exists. Skipping training."
     else
@@ -42,7 +42,7 @@ for train_effect in $TRAIN_CONDITIONS; do
         echo "Evaluating model '$train_effect' on test condition '$test_effect'"
         MODEL_PATH="$MODELS_DIR/${train_effect}_model.pth"
         OUTPUT_PATH="$EVAL_DIR/${train_effect}_on_${test_effect}.json"
-        
+
         if [ -f "$OUTPUT_PATH" ]; then
             echo "Evaluation result $OUTPUT_PATH already exists. Skipping."
         else

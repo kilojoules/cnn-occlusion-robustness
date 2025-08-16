@@ -3,7 +3,7 @@ data_dir: "../GTSRB_dataset/GTSRB/Final_Training/Images/"
 test_data_dir: "../GTSRB_dataset/GTSRB_test/Final_Test/Images/"
 
 # General experiment parameters
-epochs: 1 # Reduced from 3 to 1 for the quickest training cycle.
+epochs: 20
 learning_rate: 0.001
 batch_size: 64
 
