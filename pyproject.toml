@@ -44,6 +44,8 @@ train-gtsrb = "cnn_occlusion_robustness.train:main"
 analyze-results = "cnn_occlusion_robustness.analysis.advanced_analysis_report:main"
 visualize-filters = "cnn_occlusion_robustness.analysis.visualize_filters:main"
 visualize-activations = "cnn_occlusion_robustness.analysis.visualize_activations:main"
+plot-training-curves = "cnn_occlusion_robustness.analysis.plot_training_curves:main"
+
 
 
 [tool.setuptools.packages.find]
