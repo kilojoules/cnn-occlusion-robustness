@@ -25,21 +25,22 @@ Then train and evaluate CNNs to recognize GTSRB signs under these different weat
 ```
 cnn-occlusion-robustness/
 ├── configs/
-│   └── eval/
-│       └── matrix.yaml        # Main config for experiments
-├── results/                   # Raw output (models, eval JSONs, matrices)
-├── analysis_output/           # Final reports and publication-quality figures
+│   └── eval/matrix.yaml          # Main experiment configuration
+├── results/                      # Raw output (models, eval JSONs)
+├── analysis_output/              # Final reports and figures
 ├── scripts/
-│   ├── run_all.sh             # Main script to run the full pipeline
-│   └── organize_test_set.py   # One-time script to structure the GTSRB test set
+│   ├── run_all.sh                # Main pipeline script
+│   ├── organize_test_set.py      # Data pre-processing script
+│   └── tune.py                   # Hyperparameter tuning script
 ├── src/
 │   └── cnn_occlusion_robustness/
-│       ├── analysis/          # Analysis and visualization scripts
-│       ├── data/              # Dataset handling
-│       ├── models/            # CNN architecture definitions
-│       ├── train.py           # Training script
-│       └── eval.py            # Evaluation script
-├── pyproject.toml             # Project definition and dependencies
+│       ├── analysis/             # Analysis and visualization scripts
+│       ├── data/                 # Dataset handling
+│       ├── models/               # CNN architecture definitions
+│       ├── train.py              # Training script
+│       └── eval.py               # Evaluation script
+├── tests/                        # Unit and integration tests
+├── pyproject.toml                # Project definition and dependencies
 └── README.md
 ```
 
@@ -124,7 +125,7 @@ This script automates the four main phases of the experiment:
 This project includes several command-line tools for running specific tasks or performing deeper analysis.
 
 #### `analyze-results`
-Generates the final analysis report from an existing set of results.
+Generates the final analysis report from an existing set of results, including the above heatmap.
 ```bash
 analyze-results --results-dir ./results --output-dir ./analysis_output
 ```
@@ -134,11 +135,15 @@ Visualizes the learned kernels (filters) of a specific convolutional layer in a 
 
 *Example: Visualize `conv1` filters from the `mixed_heavy` model:*
 ```bash
-visualize-filters \
-    --config configs/eval/matrix.yaml \
-    --model-path results/models/mixed_heavy_model.pth \
-    --output-path conv1_filters.png
+visualize-filters     --config configs/eval/matrix.yaml     --model-path results/models/light_rain_model.pth     --output-path conv1_filters.png
 ```
+Trained light rain model filters:
+
+![light rain CNN model filters](analysis_output/figures/light_rain_conv1_filters.png)
+
+Trained model filters with no occlusion:
+
+![clean CNN model filters](analysis_output/figures/none_conv1_filters.png)
 
 *Example: Visualize `conv2` filters from the same model:*
 
@@ -173,15 +178,22 @@ visualize-activations \
     --test-effect heavy_dust \
     --output-dir activations_heavy_dust
 ```
+In this example, we show the activation function associated with this image in each layer of our models
 
-## Understanding the Output
+![activation image](scripts/00243.ppm)
 
-After a full run, the key outputs will be in:
-* `results/`: Contains the trained models (`.pth`), individual evaluation scores (`.json`), and the final performance matrix (`.csv`).
-* `analysis_output/`: Contains the final results.
-    * `reports/comprehensive_analysis.md`: The main report with key findings.
-    * `figures/performance_heatmap.png`: A visualization of the cross-domain performance matrix.
-    * `tables/`: All calculated metrics in CSV format.
+Activations for light dust:
+
+![light dust conv2d](analysis_output/figures/activations_light_dust/conv2d_0_activations.png)
+![light dust relu1](analysis_output/figures/activations_light_dust/relu_1_activations.png)
+![light dust maxpool2d 2](analysis_output/figures/activations_light_dust/maxpool2d_2_activations.png)
+
+Activations for no occlusion:
+
+![light dust conv2d](analysis_output/figures/activations_clean/conv2d_0_activations.png)
+![light dust relu1](analysis_output/figures/activations_clean/relu_1_activations.png)
+![light dust maxpool2d 2](analysis_output/figures/activations_clean/maxpool2d_2_activations.png)
+
 
 ## Contributing
 
