@@ -164,7 +164,9 @@ visualize-filters \
 ```
 
 #### `visualize-activations`
-Visualizes the feature map activations for a given input image. This shows how the model "sees" a specific image and which features are triggered by clean or occluded inputs.
+Visualizes the fundamental pattern detectors (convolutional kernels) that the model learns during training. Think of each filter as a specialized magnifying glass 🕵️ one learns to find vertical edges, another looks for the color red, and another for a specific curve or texture. This tool shows you a picture of the exact pattern each "magnifying glass" is searching for as it slides across an image.
+
+This is powerful because it reveals how a model's core perception strategy changes based on its training data.
 
 *Example: See how the model activates on a clean test image:*
 ```bash
