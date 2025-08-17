@@ -149,6 +149,8 @@ Trained model filters with no occlusion:
 
 ![clean CNN model filters](analysis_output/figures/none_conv1_filters.png)
 
+The filters in the model trained with the clean data are sharper wiith more distinct gradients, while the filters in the models trained with sampled sensor occlusion seem less focused on razor-sharp edges and more on color gradients and textures. This suggests the rain-trained model may be learning to average out or ignore the high-frequency noise introduced by rain streaks, focusing instead on the larger, more consistent shapes underneath.
+
 *Example: Visualize `conv2` filters from the same model:*
 
 The current script handles this by just showing the weights for the first input channel of each filter as a grayscale image, which is a common simplification but not always a complete picture.
@@ -197,6 +199,17 @@ Activations for no occlusion:
 ![light dust conv2d](analysis_output/figures/activations_clean/conv2d_0_activations.png)
 ![light dust relu1](analysis_output/figures/activations_clean/relu_1_activations.png)
 ![light dust maxpool2d 2](analysis_output/figures/activations_clean/maxpool2d_2_activations.png)
+
+The activations tell a fascinating story about the models' different processing strategies. The most interesting trend is **Sparsity vs. Density**.
+
+**Activations for the "Clean" Model:** This model is confident and efficient. Notice how after the first layer (conv2d_0), and especially after the ReLU activation (relu_1), many of the feature maps are almost entirely black. This is called **sparse activation**. The model quickly identifies the most important features—the sharp edges of the "20" and the circular border—and effectively ignores the rest. It's confident about what matters and discards irrelevant information early on.
+
+**Activations for the "Light Dust" Model:** This model is more cautious and vigilant. The activations are noticeably denser; far fewer feature maps are completely black. More neurons remain active throughout the layers. Why is this happening? Because this model was trained on noisy, ambiguous data, it can't be as certain about what's signal (the sign) and what's noise (a dust particle). Instead of discarding information, it keeps more features "alive" for later layers to process. It's essentially saying, "This might be important, let's keep it for now," making it more robust to unpredictable noise.
+
+The activations tell a fascinating story about the models' different processing strategies. The most interesting trend is Sparsity vs. Density.
+
+
+**Why is this happening?** Because this model was trained on noisy, ambiguous data, it can't be as certain about what's signal (the sign) and what's noise (a dust particle). Instead of discarding information, it keeps more features "alive" for later layers to process. It's essentially saying, "This might be important, let's keep it for now," making it more robust to unpredictable noise.
 
 #### `plot-training-curves`
 Generates plots of training and validation loss/accuracy over epochs for each trained model. This is useful for diagnosing issues like overfitting or poor convergence.
