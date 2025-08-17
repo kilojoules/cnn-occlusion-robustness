@@ -180,7 +180,7 @@ visualize-activations \
 ```
 In this example, we show the activation function associated with this image in each layer of our models
 
-![activation image](scripts/00243.ppm)
+![activation image](scripts/00243.png)
 
 Activations for light dust:
 
