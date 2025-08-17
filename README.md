@@ -5,7 +5,7 @@
 
 This research project investigates the robustness of Convolutional Neural Networks (CNNs) against common camera occlusion effects like rain and dust. Using the German Traffic Sign Recognition Benchmark (GTSRB) dataset, we train models under various conditions and analyze their performance degradation and internal representations.
 
-We define various sensor noise types
+We define various sensor noise types using the [`camera_occlusion`](https://github.com/kilojoules/camera_occlusion) Python package:
 
 ![Noise gallery](analysis_output/figures/effects_gallery.png)
 
