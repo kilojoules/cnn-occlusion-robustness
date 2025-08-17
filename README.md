@@ -141,6 +141,10 @@ Trained light rain model filters:
 
 ![light rain CNN model filters](analysis_output/figures/light_rain_conv1_filters.png)
 
+Model trained on light dust:
+
+![light rain CNN model filters](analysis_output/figures/light_dust_conv1_filters.png)
+
 Trained model filters with no occlusion:
 
 ![clean CNN model filters](analysis_output/figures/none_conv1_filters.png)

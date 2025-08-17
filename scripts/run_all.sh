@@ -83,6 +83,7 @@ python src/cnn_occlusion_robustness/analysis/visualize_effects.py --image-path .
 # filters viz
 visualize-filters     --config configs/eval/matrix.yaml     --model-path results/models/none_model.pth     --output-path none_conv1_filters.png
 visualize-filters     --config configs/eval/matrix.yaml     --model-path results/models/light_rain_model.pth     --output-path light_rain_conv1_filters.png
+visualize-filters     --config configs/eval/matrix.yaml     --model-path results/models/light_dust_model.pth     --output-path light_dust_conv1_filters.png
 
 visualize-activations     --config configs/eval/matrix.yaml     --model-path results/models/light_dust_model.pth     --image-path ../GTSRB_dataset/GTSRB_test/Final_Test/Images/00000/00243.ppm     --output-dir analysis_output/figures/activations_light_dust
 visualize-activations     --config configs/eval/matrix.yaml     --model-path results/models/none_model.pth     --image-path ../GTSRB_dataset/GTSRB_test/Final_Test/Images/00000/00243.ppm     --output-dir analysis_output/figures/activations_clean
