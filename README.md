@@ -204,9 +204,7 @@ The activations tell a fascinating story about the models' different processing 
 
 **Activations for the "Clean" Model:** This model is confident and efficient. Notice how after the first layer (conv2d_0), and especially after the ReLU activation (relu_1), many of the feature maps are almost entirely black. This is called **sparse activation**. The model quickly identifies the most important features—the sharp edges of the "20" and the circular border—and effectively ignores the rest. It's confident about what matters and discards irrelevant information early on.
 
-**Activations for the "Light Dust" Model:** This model is more cautious and vigilant. The activations are noticeably denser; far fewer feature maps are completely black. More neurons remain active throughout the layers. Why is this happening? Because this model was trained on noisy, ambiguous data, it can't be as certain about what's signal (the sign) and what's noise (a dust particle). Instead of discarding information, it keeps more features "alive" for later layers to process. It's essentially saying, "This might be important, let's keep it for now," making it more robust to unpredictable noise.
-
-The activations tell a fascinating story about the models' different processing strategies. The most interesting trend is Sparsity vs. Density.
+**Activations for the "Light Dust" Model:** This model is more cautious and vigilant. The activations are noticeably denser; far fewer feature maps are completely black. More neurons remain active throughout the layers.
 
 
 **Why is this happening?** Because this model was trained on noisy, ambiguous data, it can't be as certain about what's signal (the sign) and what's noise (a dust particle). Instead of discarding information, it keeps more features "alive" for later layers to process. It's essentially saying, "This might be important, let's keep it for now," making it more robust to unpredictable noise.
