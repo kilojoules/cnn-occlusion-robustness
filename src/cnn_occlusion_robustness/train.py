@@ -42,17 +42,17 @@ class AugmentedDataset(torch.utils.data.Dataset):
 
 def apply_mixed_light(img):
     """Applies a light mix of rain and dust effects."""
-    effect = Dust(num_specks=1200, splotch_opacity=0.08)(
-        Rain(num_drops=20, radius_range=(2, 4))(img)
-    )
+    effect = Dust(
+        num_specks=20, speck_opacity=0.4, num_scratches=1, splotch_opacity=0.1
+    )(Rain(num_drops=20, radius_range=(2, 4))(img))
     return effect
 
 
 def apply_mixed_heavy(img):
     """Applies a heavy mix of rain and dust effects."""
-    effect = Dust(num_specks=4200, num_scratches=4, splotch_opacity=0.14)(
-        Rain(num_drops=120, radius_range=(4, 8))(img)
-    )
+    effect = Dust(
+        num_specks=50, speck_opacity=0.8, num_scratches=5, splotch_opacity=0.02
+    )(Rain(num_drops=120, radius_range=(4, 8))(img))
     return effect
 
 

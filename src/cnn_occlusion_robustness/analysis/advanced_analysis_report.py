@@ -80,7 +80,7 @@ class OcclusionRobustnessAnalyzer:
 
     def generate_publication_figures(self):
         """Generate high-quality figures for publication."""
-        print("Generating publication-quality figures...")
+        print("Generating figures...")
 
         # Figure 1: Main performance heatmap
         self.create_publication_heatmap()
@@ -118,7 +118,7 @@ class OcclusionRobustnessAnalyzer:
             ax=ax,
         )
 
-        # Improve formatting
+        # --- This is the only block needed for formatting ---
         ax.set_title(
             "Cross-Domain Performance Matrix:\nTraining Condition vs. Test Condition",
             fontsize=16,
@@ -127,16 +127,28 @@ class OcclusionRobustnessAnalyzer:
         )
         ax.set_xlabel("Test Condition", fontsize=14, fontweight="bold")
         ax.set_ylabel("Training Condition", fontsize=14, fontweight="bold")
-
-        # Rotate labels for better readability
         ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
         ax.set_yticklabels(ax.get_yticklabels(), rotation=0)
+        # --- End of formatting block ---
 
-        # Add diagonal line to highlight in-domain performance
-        for i in range(min(len(ax.get_xticklabels()), len(ax.get_yticklabels()))):
-            ax.add_patch(
-                plt.Rectangle((i, i), 1, 1, fill=False, edgecolor="blue", lw=3)
-            )
+        # Get the actual labels for rows and columns
+        row_labels = self.evaluation_data.index.to_list()
+        col_labels = self.evaluation_data.columns.to_list()
+
+        # Find the correct cell where the row label matches the column label
+        for i, train_condition in enumerate(row_labels):
+            try:
+                # Find the column index 'j' that matches the current row's train_condition
+                j = col_labels.index(train_condition)
+
+                # Draw the rectangle at the correct (column, row) coordinate
+                ax.add_patch(
+                    plt.Rectangle((j, i), 1, 1, fill=False, edgecolor="blue", lw=3)
+                )
+            except ValueError:
+                # This happens if a training condition is not in the test set.
+                # We can safely ignore it.
+                pass
 
         plt.tight_layout()
         plt.savefig(

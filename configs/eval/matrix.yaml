@@ -22,12 +22,15 @@ model:
 # Train only the baseline and one complex model to start.
 training_conditions:
   - none
-  - mixed_heavy
+  - light_rain
+  - light_dust
 
 # List of effects to use for testing
 # Test against a small, representative subset of conditions.
 test_conditions:
   - none
+  - light_rain
+  - light_dust
   - heavy_rain
   - heavy_dust
-  - mixed_heavy
+  - mixed_light
