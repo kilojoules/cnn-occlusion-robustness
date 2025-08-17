@@ -78,5 +78,6 @@ python src/cnn_occlusion_robustness/analysis/advanced_analysis_report.py \
     --output-dir "analysis_output"
 
 plot-training-curves --results-dir results/models/ --output-dir analysis_output/figures/training_curves --smooth-k 3
+python src/cnn_occlusion_robustness/analysis/visualize_effects.py --image-path ../GTSRB_dataset/GTSRB/Final_Training/Images/00000/00000_00000.ppm --effects none light_rain heavy_rain light_dust heavy_dust mixed_light
 
 echo "--- ✅ Pipeline Complete! Check analysis_output/ for results. ---"
