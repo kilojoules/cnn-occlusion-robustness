@@ -80,4 +80,11 @@ python src/cnn_occlusion_robustness/analysis/advanced_analysis_report.py \
 plot-training-curves --results-dir results/models/ --output-dir analysis_output/figures/training_curves --smooth-k 3
 python src/cnn_occlusion_robustness/analysis/visualize_effects.py --image-path ../GTSRB_dataset/GTSRB/Final_Training/Images/00000/00000_00000.ppm --effects none light_rain heavy_rain light_dust heavy_dust mixed_light
 
+# filters viz
+visualize-filters     --config configs/eval/matrix.yaml     --model-path results/models/none_model.pth     --output-path none_conv1_filters.png
+visualize-filters     --config configs/eval/matrix.yaml     --model-path results/models/light_rain_model.pth     --output-path light_rain_conv1_filters.png
+
+visualize-activations     --config configs/eval/matrix.yaml     --model-path results/models/light_dust_model.pth     --image-path ../GTSRB_dataset/GTSRB_test/Final_Test/Images/00000/00243.ppm     --output-dir analysis_output/figures/activations_light_dust
+visualize-activations     --config configs/eval/matrix.yaml     --model-path results/models/none_model.pth     --image-path ../GTSRB_dataset/GTSRB_test/Final_Test/Images/00000/00243.ppm     --output-dir analysis_output/figures/activations_clean
+
 echo "--- ✅ Pipeline Complete! Check analysis_output/ for results. ---"

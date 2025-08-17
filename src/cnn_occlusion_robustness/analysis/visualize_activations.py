@@ -5,8 +5,12 @@ from torchvision import transforms
 from PIL import Image
 import yaml
 import argparse
+import os  # Make sure os is imported
+
+# NEW: Import the factory
+from cnn_occlusion_robustness.models.factory import create_model_from_config
 from cnn_occlusion_robustness.train import get_effect
-from cnn_occlusion_robustness.models.simple_cnn import SimpleCNN
+
 
 # Dictionary to store the activations
 activations = {}
@@ -29,28 +33,26 @@ def visualize_activations(
     test_effect: str,
 ):
     """Loads a model and an image, and visualizes the layer activations."""
+    os.makedirs(output_dir, exist_ok=True)
 
-    # --- 1. Load Configuration and Build the Model ---
+    # --- 1. Load Configuration and Build the Model using the Factory ---
     with open(config_path, "r") as f:
         config = yaml.safe_load(f)
 
-    model_params = config.get("model", {}).get("params", {})
-    if not model_params:
-        raise ValueError("Model parameters not found in config file.")
+    architecture = config.get("model", {}).get("architecture")
+    if not architecture:
+        raise ValueError("Model architecture not found in config file.")
 
-    # Build the model with the correct architecture
-    model = SimpleCNN(**model_params)
-
-    # Load the trained weights into the correctly-structured model
+    model = create_model_from_config(architecture)
     model.load_state_dict(torch.load(model_path, map_location=torch.device("cpu")))
     model.eval()
     print(f"Model loaded from {model_path} using architecture from {config_path}")
 
-    # --- 2. Register Hooks ---
-    # This part remains the same. It correctly targets the hidden layers.
-    model.conv1.register_forward_hook(get_activation("conv1"))
-    model.pool.register_forward_hook(get_activation("pool1"))
-    model.conv2.register_forward_hook(get_activation("conv2"))
+    # --- 2. Register Hooks Dynamically ---
+    for name, layer in model.named_modules():
+        if isinstance(layer, (torch.nn.Conv2d, torch.nn.MaxPool2d, torch.nn.ReLU)):
+            layer.register_forward_hook(get_activation(name))
+            print(f"Registered hook for layer: {name}")
 
     # --- 3. Prepare the Input Image ---
     transform = transforms.Compose(
@@ -60,51 +62,54 @@ def visualize_activations(
         ]
     )
     image = Image.open(image_path).convert("RGB")
-    clean_image_tensor = transform(image)  # Start with a clean tensor
+    clean_image_tensor = transform(image)
 
-    # --- 4. APPLY OCCLUSION EFFECT (NEW STEP) ---
+    # --- 4. Apply Occlusion Effect ---
     effect_instance = get_effect(test_effect)
-
-    # Convert tensor to numpy, apply effect, and convert back to tensor
-    # This logic is borrowed from the AugmentedDataset in train.py
     image_np = (clean_image_tensor.permute(1, 2, 0).contiguous().numpy() * 255).astype(
         "uint8"
     )
     augmented_np = effect_instance(image_np)
     augmented_tensor = torch.from_numpy(augmented_np).permute(2, 0, 1) / 255.0
-
-    # Add the batch dimension for the model
     final_image_tensor = augmented_tensor.float().unsqueeze(0)
 
     # --- 5. Perform Forward Pass ---
     with torch.no_grad():
-        # Use the potentially augmented tensor
         _ = model(final_image_tensor)
-
     print(f"Forward pass complete for effect '{test_effect}'. Activations captured.")
 
     # --- 6. Plot the Activations ---
+
+    # NEW: Extract a clean model name from the file path
+    model_name = os.path.basename(model_path).replace("_model.pth", "")
+
     for name, feature_map in activations.items():
-        # The feature map is a 4D tensor (batch, channels, height, width)
-        # We take the first item in the batch
+        if feature_map.dim() < 4:
+            continue
+
         feature_map = feature_map[0]
 
-        # Make a grid of the channels
         grid = torchvision.utils.make_grid(
-            feature_map.unsqueeze(1),  # Add a dimension for grayscale
-            nrow=4,  # Adjust number of columns in the grid
+            feature_map.unsqueeze(1),
+            nrow=8,
             normalize=True,
             pad_value=1,
         )
 
-        plt.figure(figsize=(10, 10))
+        plt.figure(figsize=(12, 12))
         plt.imshow(grid.permute(1, 2, 0))
-        plt.title(f"Activations for Layer: '{name}'\nShape: {list(feature_map.shape)}")
+
+        # UPDATED: Add the model name and effect to the plot title
+        plt.title(
+            f"Model: '{model_name}' | Layer: '{name}'\n"
+            f"Input Effect: '{test_effect}' | Shape: {list(feature_map.shape)}"
+        )
+
         plt.axis("off")
 
-        save_path = f"{output_dir}/{name}_activations.png"
-        plt.savefig(save_path, dpi=300, bbox_inches="tight")
-        plt.show()
+        save_path = os.path.join(output_dir, f"{name}_activations.png")
+        plt.savefig(save_path, dpi=150, bbox_inches="tight")
+        plt.close()
         print(f"Activation plot for '{name}' saved to {save_path}")
 
 
@@ -142,10 +147,6 @@ def main():
     )
 
     args = parser.parse_args()
-
-    import os
-
-    os.makedirs(args.output_dir, exist_ok=True)
 
     visualize_activations(
         config_path=args.config,
