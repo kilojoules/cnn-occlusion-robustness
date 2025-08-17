@@ -194,6 +194,21 @@ Activations for no occlusion:
 ![light dust relu1](analysis_output/figures/activations_clean/relu_1_activations.png)
 ![light dust maxpool2d 2](analysis_output/figures/activations_clean/maxpool2d_2_activations.png)
 
+#### `plot-training-curves`
+Generates plots of training and validation loss/accuracy over epochs for each trained model. This is useful for diagnosing issues like overfitting or poor convergence.
+
+*Example: Generate plots for all models and save them to the analysis directory:*
+```bash
+plot-training-curves \
+    --results-dir results/models/ \
+    --output-dir analysis_output/figures/training_curves \
+    --smooth-k 3
+```
+![none training](analysis_output/figures/training_curves/none_training_curves.png )
+![light dust training](analysis_output/figures/training_curves/light_dust_training_curves.png )
+![light rain training](analysis_output/figures/training_curves/light_rain_training_curves.png )
+
+
 
 ## Contributing
 
