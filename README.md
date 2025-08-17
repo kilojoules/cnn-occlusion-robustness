@@ -203,7 +203,7 @@ Activations for no occlusion:
 ![light dust relu1](analysis_output/figures/activations_clean/relu_1_activations.png)
 ![light dust maxpool2d 2](analysis_output/figures/activations_clean/maxpool2d_2_activations.png)
 
-The activations tell a fascinating story about the models' different processing strategies. The most interesting trend is **Sparsity vs. Density**.
+The activations tell a fascinating story about the models' different processing strategies. The most interesting trend is **Sparsity vs. Density**. The clean model could afford to be sparse because its world was predictable. The dusty model needed density because it faced uncertainty.
 
 **Activations for the "Clean" Model:** This model is confident and efficient. Notice how after the first layer (conv2d_0), and especially after the ReLU activation (relu_1), many of the feature maps are almost entirely black. This is called **sparse activation**. The model quickly identifies the most important features—the sharp edges of the "20" and the circular border—and effectively ignores the rest. It's confident about what matters and discards irrelevant information early on.
 
