@@ -9,11 +9,13 @@ import argparse
 import json
 import os
 
-# Import modules from within the same package
 from cnn_occlusion_robustness.data.gtsrb import GTSRBDataset
-from cnn_occlusion_robustness.models.simple_cnn import SimpleCNN
+from cnn_occlusion_robustness.models.factory import (
+    create_model_from_config,
+)  # New import
+import optuna
 
-# Import the external dependency
+
 from camera_occlusion import Rain, Dust, Effect
 
 
@@ -87,6 +89,78 @@ def get_effect(effect_name: str) -> Effect:
             f"Unknown effect: {effect_name}. Available: {list(effects.keys())}"
         )
     return effects[effect_name]
+
+
+def run_training_trial(config, save_path, train_effect_name, device, trial=None):
+    """A self-contained, callable training function with pruning."""
+
+    # --- Setup logic from your original main() ---
+    epochs = config["epochs"]
+    batch_size = config["batch_size"]
+    learning_rate = config["learning_rate"]
+    data_dir = config["data_dir"]
+
+    train_effect_instance = get_effect(train_effect_name)
+    transform = transforms.Compose([transforms.Resize((32, 32)), transforms.ToTensor()])
+
+    full_dataset = GTSRBDataset(root_dir=data_dir, transform=transform)
+    train_size = int(0.8 * len(full_dataset))
+    val_size = len(full_dataset) - train_size
+    train_dataset, val_dataset = random_split(full_dataset, [train_size, val_size])
+
+    augmented_train_dataset = AugmentedDataset(train_dataset, train_effect_instance)
+    train_loader = DataLoader(
+        augmented_train_dataset, batch_size=batch_size, shuffle=True, num_workers=4
+    )
+    val_loader = DataLoader(
+        val_dataset, batch_size=batch_size, shuffle=False, num_workers=4
+    )
+
+    model_config = config.get("model")
+    model = create_model_from_config(model_config["architecture"]).to(device)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.parameters(), lr=learning_rate)
+
+    best_val_acc = 0.0
+
+    # --- Full Training & Validation Loop ---
+    for epoch in range(epochs):
+        # Training Phase
+        model.train()
+        pbar = tqdm(train_loader, desc=f"Epoch {epoch+1}/{epochs} [Train]", leave=False)
+        for inputs, labels in pbar:
+            inputs, labels = inputs.to(device), labels.to(device)
+            optimizer.zero_grad()
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+            loss.backward()
+            optimizer.step()
+
+        # Validation Phase
+        model.eval()
+        correct, total = 0, 0
+        with torch.no_grad():
+            for inputs, labels in val_loader:
+                inputs, labels = inputs.to(device), labels.to(device)
+                outputs = model(inputs)
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+        epoch_val_acc = correct / total
+
+        if trial:
+            trial.report(epoch_val_acc, epoch)
+            if trial.should_prune():
+                # This exception tells Optuna to stop this trial early.
+                raise optuna.TrialPruned()
+
+        if epoch_val_acc > best_val_acc:
+            best_val_acc = epoch_val_acc
+            if save_path and save_path != "/dev/null":
+                torch.save(model.state_dict(), save_path)
+
+    return best_val_acc
 
 
 def main():
@@ -179,7 +253,15 @@ def main():
 
     # Instantiate the model using the parameters from the config
     # The ** operator unpacks the dictionary into keyword arguments
-    model = SimpleCNN(**model_config["params"]).to(device)
+    # model = SimpleCNN(**model_config["params"]).to(device)
+    model_config = config.get("model")
+    if not model_config or "architecture" not in model_config:
+        raise ValueError("Model architecture not found in YAML file.")
+
+    # Use the factory to build the model from the config
+    model = create_model_from_config(model_config["architecture"]).to(device)
+    print("--- Model Architecture ---")
+    print(model)
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)

@@ -10,8 +10,8 @@ from tqdm import tqdm
 import yaml
 
 from cnn_occlusion_robustness.data.gtsrb import GTSRBDataset
-from cnn_occlusion_robustness.models.simple_cnn import SimpleCNN
 from cnn_occlusion_robustness.train import get_effect, AugmentedDataset
+from cnn_occlusion_robustness.models.factory import create_model_from_config
 
 
 def _resolve_device() -> torch.device:
@@ -24,27 +24,29 @@ def _resolve_device() -> torch.device:
 
 def _load_model_from_config(
     config_path: str, weights_path: str, device: torch.device
-) -> SimpleCNN:
+) -> torch.nn.Module:  # Return a generic torch.nn.Module
     if not os.path.exists(config_path):
         raise FileNotFoundError(f"Config file not found: {config_path}")
 
     with open(config_path, "r") as f:
         cfg = yaml.safe_load(f)
 
-    model_params = (cfg or {}).get("model", {}).get("params", {})
-    if not model_params:
+    # ✅ MODIFIED BLOCK: Use the factory function
+    model_config = (cfg or {}).get("model", {})
+    architecture = model_config.get("architecture")
+    if not architecture:
         raise ValueError(
-            "Model parameters not found in config['model']['params']. "
-            "Ensure your YAML includes the 'model: { params: ... }' block."
+            "Model architecture not found in config['model']['architecture']."
         )
 
-    model = SimpleCNN(**model_params).to(device)
+    # Build the model from the architecture list
+    model = create_model_from_config(architecture).to(device)
+    # ❌ END OF MODIFIED BLOCK
 
     if not os.path.exists(weights_path):
         raise FileNotFoundError(f"Model weights not found at: {weights_path}")
 
     state = torch.load(weights_path, map_location=device)
-    # Use strict=True to fail fast if the architecture doesn't match.
     model.load_state_dict(state, strict=True)
     model.eval()
     return model

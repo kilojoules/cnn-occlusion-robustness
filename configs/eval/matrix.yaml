@@ -3,20 +3,9 @@ data_dir: "../GTSRB_dataset/GTSRB/Final_Training/Images/"
 test_data_dir: "../GTSRB_dataset/GTSRB_test/Final_Test/Images/"
 
 # General experiment parameters
-epochs: 20
-learning_rate: 0.001
+epochs: 30
+learning_rate: 0.0005
 batch_size: 64
-
-model:
-  name: "SimpleCNN" # Allows for selecting different models later
-  params:
-    num_classes: 43
-    # Define channels as a list: [input, conv1_output, conv2_output]
-    channels: [3, 6, 16]
-    kernel_size: 5
-    # Define features for fully-connected layers: [fc1_output, fc2_output]
-    fc_features: [120, 84]
-
 
 # List of effects to use for training models
 # Train only the baseline and one complex model to start.
@@ -34,3 +23,18 @@ test_conditions:
   - heavy_rain
   - heavy_dust
   - mixed_light
+
+
+model:
+  architecture:
+    - type: Conv2d
+      params: {in_channels: 3, out_channels: 16, kernel_size: 5}
+    - type: ReLU
+    - type: MaxPool2d
+      params: {kernel_size: 2, stride: 2}
+    - type: Flatten
+    - type: Linear
+      params: {out_features: 84}
+    - type: ReLU
+    - type: Linear
+      params: {out_features: 43}

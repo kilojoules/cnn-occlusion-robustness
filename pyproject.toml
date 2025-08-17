@@ -33,6 +33,7 @@ dependencies = [
     "matplotlib",
     "seaborn",
     "scipy",
+    "optuna",
     "scikit-learn",
 ]
 
