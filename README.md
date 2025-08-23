@@ -136,7 +136,7 @@ Visualizes the fundamental pattern detectors (convolutional kernels) that the mo
 This is powerful because it reveals how a model's core perception strategy changes based on its training data.
 
 
-*Example: Visualize `conv1` filters from the `mixed_heavy` model:*
+**Example**: Visualize `conv1` filters from the `mixed_heavy` model:*
 ```bash
 visualize-filters     --config configs/eval/matrix.yaml     --model-path results/models/light_rain_model.pth     --output-path conv1_filters.png
 ```
@@ -154,7 +154,7 @@ Trained model filters with no occlusion:
 
 The filters in the model trained with the clean data are sharper wiith more distinct gradients, while the filters in the models trained with sampled sensor occlusion seem less focused on razor-sharp edges and more on color gradients and textures. This suggests the rain-trained model may be learning to average out or ignore the high-frequency noise introduced by rain streaks, focusing instead on the larger, more consistent shapes underneath.
 
-*Example: Visualize `conv2` filters from the same model:*
+**Example**: Visualize `conv2` filters from the same model:*
 
 The current script handles this by just showing the weights for the first input channel of each filter as a grayscale image, which is a common simplification but not always a complete picture.
 
@@ -169,7 +169,7 @@ visualize-filters \
 #### `visualize-activations`
 Visualizes the feature map activations for a given input image. This shows how the model "sees" a specific image and which features are triggered by clean or occluded inputs.
 
-*Example: See how the model activates on a clean test image:*
+**Example**: See how the model activates on a clean test image:*
 ```bash
 visualize-activations \
     --config configs/eval/matrix.yaml \
@@ -178,7 +178,7 @@ visualize-activations \
     --output-dir activations_clean
 ```
 
-*Example: See activations for the same image but with a `heavy_dust` effect applied:*
+**Example**: See activations for the same image but with a `heavy_dust` effect applied:*
 ```bash
 visualize-activations \
     --config configs/eval/matrix.yaml \
@@ -215,7 +215,7 @@ The activations tell a fascinating story about the models' different processing 
 #### `plot-training-curves`
 Generates plots of training and validation loss/accuracy over epochs for each trained model. This is useful for diagnosing issues like overfitting or poor convergence.
 
-*Example: Generate plots for all models and save them to the analysis directory:*
+**Example**: Generate plots for all models and save them to the analysis directory:*
 ```bash
 plot-training-curves \
     --results-dir results/models/ \
